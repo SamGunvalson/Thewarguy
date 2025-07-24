@@ -9,21 +9,27 @@ on:
       sensor-version:
         description: 'Sensor version'
         required: true
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - production
+          - 'dev & nonprod'
 
 jobs:
   create-prs:
     runs-on: ubuntu-latest
+    if: inputs.environment == 'dev & nonprod'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history to allow for accurate branch creation
-
       - name: Update KAC and Sensor versions
         run: |
           echo "Updating KAC and Sensor versions..."
-          sed -i "s/kac-version: .*/kac-version: ${{ inputs.kac-version }}/" verion.yaml
-          sed -i "s/sensor-version: .*/sensor-version: ${{ inputs.sensor-version }}/" verion.yaml
+          sed -i -z 's/#version.*/        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"' version.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
