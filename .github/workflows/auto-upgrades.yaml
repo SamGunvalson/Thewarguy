@@ -1,0 +1,67 @@
+name: Automated Upgrades
+
+on:
+  workflow_dispatch:
+    inputs:
+      kac-version:
+        description: 'KAC version'
+        required: true
+      sensor-version:
+        description: 'Sensor version'
+        required: true
+
+jobs:
+  create-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history to allow for accurate branch creation
+
+      - name: Create dev PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "Upgrade KAC and Sensor for Dev"
+          body: |
+            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }} for the dev environment.
+          branch: "dev-upgrade-${{ github.run_id }}" # Unique branch name
+          base: dev
+          commit-message: "Upgrade KAC and Sensor for Dev"
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com> # Set commit author
+          changes: |
+            echo ${{ inputs.kac-version }} > kac-version.txt
+            echo ${{ inputs.sensor-version }} > sensor-version.txt
+            echo "Dev specific changes" >> dev-specific.txt
+
+      - name: Create nonprod PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "Upgrade KAC and Sensor for Nonprod"
+          body: |
+            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }} for the nonprod environment.
+          branch: "nonprod-upgrade-${{ github.run_id }}" # Unique branch name
+          base: nonprod
+          commit-message: "Upgrade KAC and Sensor for Nonprod"
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com> # Set commit author
+          changes: |
+            echo ${{ inputs.kac-version }} > kac-version.txt
+            echo ${{ inputs.sensor-version }} > sensor-version.txt
+            echo "Nonprod specific changes" >> nonprod-specific.txt
+
+      - name: Create production PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "Upgrade KAC and Sensor for Production"
+          body: |
+            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }} for the production environment.
+          branch: "prod-upgrade-${{ github.run_id }}" # Unique branch name
+          base: production
+          commit-message: "Upgrade KAC and Sensor for Production"
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com> # Set commit author
+          changes: |
+            echo ${{ inputs.kac-version }} > kac-version.txt
+            echo ${{ inputs.sensor-version }} > sensor-version.txt
+            rm dev-specific.txt  # Remove dev-specific file
+            rm nonprod-specific.txt # Remove nonprod-specific file
+            echo "Production specific changes" >> production-specific.txt
