@@ -26,7 +26,6 @@ jobs:
           body: |
             Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }} for the dev environment.
           branch: "dev-upgrade-${{ github.run_id }}" # Unique branch name
-          base: dev
           commit-message: "Upgrade KAC and Sensor for Dev"
           author: github-actions[bot] <github-actions[bot]@users.noreply.github.com> # Set commit author
           changes: |
@@ -41,7 +40,6 @@ jobs:
           body: |
             Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }} for the nonprod environment.
           branch: "nonprod-upgrade-${{ github.run_id }}" # Unique branch name
-          base: nonprod
           commit-message: "Upgrade KAC and Sensor for Nonprod"
           author: github-actions[bot] <github-actions[bot]@users.noreply.github.com> # Set commit author
           changes: |
@@ -56,7 +54,6 @@ jobs:
           body: |
             Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }} for the production environment.
           branch: "prod-upgrade-${{ github.run_id }}" # Unique branch name
-          base: production
           commit-message: "Upgrade KAC and Sensor for Production"
           author: github-actions[bot] <github-actions[bot]@users.noreply.github.com> # Set commit author
           changes: |
