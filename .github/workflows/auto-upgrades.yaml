@@ -18,7 +18,7 @@ on:
           - 'dev & nonprod'
 
 env:
-  kac-transformer: |
+  KAC-TRANSFORMER: |
     apiVersion: builtin
     kind: PatchTransformer
     metadata:
@@ -55,7 +55,7 @@ jobs:
         run: |
           echo "Updating KAC and Sensor versions..."
           sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/version.yaml
-          echo ${{ env.kac-transformer }} > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
+          echo "$KAC-TRANSFORMER" > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
