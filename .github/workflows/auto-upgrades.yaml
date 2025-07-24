@@ -17,6 +17,31 @@ on:
           - production
           - 'dev & nonprod'
 
+env:
+  kac-transformer: |
+    apiVersion: builtin
+    kind: PatchTransformer
+    metadata:
+      name: falcon-kac-deploy
+    target:
+      group: kustomize.toolkit.fluxcd.io
+      kind: Kustomization
+      name: falcon-kac-deploy
+      namespace: flux-system
+    patch: |-
+      - op: add
+        path: /spec/patches/-
+        value:
+          target:
+            group: helm.toolkit.fluxcd.io
+            kind: HelmRelease
+            name: falcon-kac
+            namespace: falcon-kac-system
+          patch: |-
+            - op: replace
+              path: /spec/values/image/tag
+              value: "${{ inputs.kac-version }}"
+
 jobs:
   create-prs:
     runs-on: ubuntu-latest
@@ -30,6 +55,7 @@ jobs:
         run: |
           echo "Updating KAC and Sensor versions..."
           sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/version.yaml
+          echo ${{ env.kac-transformer }} > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
