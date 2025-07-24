@@ -29,7 +29,7 @@ jobs:
       - name: Update KAC and Sensor versions
         run: |
           echo "Updating KAC and Sensor versions..."
-          sed -i -z 's/#version.*/        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"' version.yaml
+          sed -i -z "s/#version.*/        - op: replace\n          path: /spec/values/node/image/tag\n          value: \"${{ inputs.sensor-version }}\"/" version.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
