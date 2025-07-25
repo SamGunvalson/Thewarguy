@@ -1,0 +1,24 @@
+# Adding a version to this file results in the corresponding chart being uploaded to artifactory
+# adding pull for CrowdStrike falcon-sensor
+include:
+  - imagerepo: wizio.azurecr.io
+    imagename: sensor
+    imagetag: "1.0.6816"
+  - imagerepo: wiziopublic.azurecr.io/wiz-app
+    imagename: wiz-broker
+    imagetag: "2.8"
+  - imagerepo: registry.crowdstrike.com/falcon-sensor/us-2/release
+    imagename: falcon-sensor
+    imagetag: "7.26.0-17905-1.falcon-linux.Release.US-2"
+  - imagerepo: registry.crowdstrike.com/falcon-kac/us-2/release
+    imagename: falcon-kac
+    imagetag: "7.27.0-2502.Release.US-2"
+  # - imagerepo: ghcr.io/headlamp-k8s
+  #   imagename: headlamp
+  #   imagetag: "v0.28.0"
+  # - imagerepo: ghcr.io/headlamp-k8s
+  #   imagename: headlamp-plugin-flux
+  #   imagetag: "v0.1.0-beta-2"
+  - imagerepo: quay.io/mittwald
+    imagename: kubernetes-replicator
+    imagetag: v2.11.1

@@ -51,31 +51,34 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history to allow for accurate branch creation
-      - name: Update KAC and Sensor versions
+      - name: Update KAC and Sensor versions for dev & nonprod
         run: |
           kac_template='apiVersion: builtin
-                        kind: PatchTransformer
-                        metadata:
-                          name: falcon-kac-deploy
-                        target:
-                          group: kustomize.toolkit.fluxcd.io
-                        kind: Kustomization
-                        name: falcon-kac-deploy
-                        namespace: flux-system
-                        patch: |-
-                          - op: add
-                            path: \spec\patches\-\n
-                            value:\n
-                              target:\n
-                                group: helm.toolkit.fluxcd.io\n
-                                kind: HelmRelease\n
-                                name: falcon-kac\n
-                                namespace: falcon-kac-system\n
-                              patch: |-\n
-                                - op: replace\n
-                                  path: \spec\values\image\tag\n
-                                  value: "${{ inputs.kac-version }}"'
+          kind: PatchTransformer
+          metadata:
+            name: falcon-kac-deploy
+          target:
+            group: kustomize.toolkit.fluxcd.io
+            kind: Kustomization
+            name: falcon-kac-deploy
+            namespace: flux-system
+          patch: |-
+            - op: add
+              path: /spec/patches/-
+              value:
+                target:
+                  group: helm.toolkit.fluxcd.io
+                  kind: HelmRelease
+                  name: falcon-kac
+                  namespace: falcon-kac-system
+                patch: |-
+                  - op: replace
+                    path: /spec/values/image/tag
+                    value: "${{ inputs.kac-version }}"'
           echo "Updating KAC and Sensor versions..."
+          sed -i -z 's|imagename: falcon-kac\n    imagetag: .*|imagename: falcon-kac\n    imagetag: "${{ inputs.kac-version }}"|' download-any-image.yaml
+          sed -i -z 's|imagename: falcon-sensor\n    imagetag: .*|imagename: falcon-sensor\n    imagetag: "${{ inputs.sensor-version }}"|' download-any-image.yaml
+          echo "Applying KAC template and Sensor version..."
           sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/version.yaml
           echo "$kac_template" > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
