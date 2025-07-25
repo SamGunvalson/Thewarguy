@@ -1,0 +1,22 @@
+apiVersion: builtin
+kind: PatchTransformer
+metadata:
+  name: falcon-kac-deploy
+target:
+  group: kustomize.toolkit.fluxcd.io
+  kind: Kustomization
+  name: falcon-kac-deploy
+  namespace: flux-system
+patch: |-
+  - op: add
+    path: /spec/patches/-
+    value:
+      target:
+        group: helm.toolkit.fluxcd.io
+        kind: HelmRelease
+        name: falcon-kac
+        namespace: falcon-kac-system
+      patch: |-
+        - op: replace
+          path: /spec/values/image/tag
+          value: "123"
