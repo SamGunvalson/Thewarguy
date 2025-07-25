@@ -28,9 +28,12 @@ jobs:
           fetch-depth: 0  # Fetch all history to allow for accurate branch creation
       - name: Update KAC and Sensor versions
         run: |
+          echo "Grabbing Falcon-KAC template..."
+          cat .github/templates/falcon-kac.md >> $FALCON_KAC_TEMPLATE
+          echo 'EOF' >> $FALCON_KAC_TEMPLATE
           echo "Updating KAC and Sensor versions..."
           sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/version.yaml
-          echo .github/templates/falcon-kac.md > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
+          echo $FALCON_KAC_TEMPLATE > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
