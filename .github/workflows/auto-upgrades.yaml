@@ -1,4 +1,4 @@
-name: Automated Upgrades
+name: Automated Falcon Upgrades
 
 on:
   workflow_dispatch:
@@ -28,8 +28,9 @@ jobs:
           fetch-depth: 0  # Fetch all history to allow for accurate branch creation
       - name: Update download-any-image.yaml
         run: |
-          sed -i -z 's|imagename: falcon-kac\n    imagetag: .*|imagename: falcon-kac\n    imagetag: "${{ inputs.kac-version }}"|' ./download-any-image.yaml
-          sed -i -z 's|imagename: falcon-sensor\n    imagetag: .*|imagename: falcon-sensor\n    imagetag: "${{ inputs.sensor-version }}"|' ./download-any-image.yaml
+          ls -l download-any-image.yaml
+          sed -i -z 's|imagename: falcon-kac\n    imagetag: .*|imagename: falcon-kac\n    imagetag: "${{ inputs.kac-version }}"|' download-any-image.yaml
+          sed -i -z 's|imagename: falcon-sensor\n    imagetag: .*|imagename: falcon-sensor\n    imagetag: "${{ inputs.sensor-version }}"|' download-any-image.yaml
           echo "Updated download-any-image.yaml with new comments."
       - name: Update KAC and Sensor versions for dev & nonprod
         run: |
