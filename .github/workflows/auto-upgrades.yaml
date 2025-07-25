@@ -18,29 +18,7 @@ on:
           - 'dev & nonprod'
 
 env:
-  KAC-TRANSFORMER: |
-    apiVersion: builtin
-    kind: PatchTransformer
-    metadata:
-      name: falcon-kac-deploy
-    target:
-      group: kustomize.toolkit.fluxcd.io
-      kind: Kustomization
-      name: falcon-kac-deploy
-      namespace: flux-system
-    patch: |-
-      - op: add
-        path: /spec/patches/-
-        value:
-          target:
-            group: helm.toolkit.fluxcd.io
-            kind: HelmRelease
-            name: falcon-kac
-            namespace: falcon-kac-system
-          patch: |-
-            - op: replace
-              path: /spec/values/image/tag
-              value: "${{ inputs.kac-version }}"
+  KAC-TRANSFORMER: 'apiVersion:builtin\nkind:PatchTransformer\nmetadata:\nname:falcon-kac-deploy\ntarget:\ngroup:kustomize.toolkit.fluxcd.io\nkind:Kustomization\nname:falcon-kac-deploy\nnamespace:flux-system\npatch:|-\n-op:add\npath:\spec\patches\-\nvalue:\ntarget:\ngroup:helm.toolkit.fluxcd.io\nkind:HelmRelease\nname:falcon-kac\nnamespace:falcon-kac-system\npatch:|-\n-op:replace\npath:\spec\values\image\tag\nvalue:"${{inputs.kac-version}}"'
 
 jobs:
   create-prs:
