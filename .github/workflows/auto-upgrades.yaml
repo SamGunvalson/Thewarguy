@@ -17,6 +17,31 @@ on:
           - production
           - 'dev & nonprod'
 
+env:
+  FALCON_KAC_TEMPLATE: |-
+    'apiVersion: builtin
+    kind: PatchTransformer
+    metadata:
+      name: falcon-kac-deploy
+    target:
+      group: kustomize.toolkit.fluxcd.io
+    kind: Kustomization
+    name: falcon-kac-deploy
+    namespace: flux-system
+    patch: |-
+      - op: add
+        path: \spec\patches\-\n
+        value:\n
+          target:\n
+            group: helm.toolkit.fluxcd.io\n
+            kind: HelmRelease\n
+            name: falcon-kac\n
+            namespace: falcon-kac-system\n
+          patch: |-\n
+            - op: replace\n
+              path: \spec\values\image\tag\n
+              value: "7.27.0-2502.Release.US-2"'
+
 jobs:
   create-prs:
     runs-on: ubuntu-latest
@@ -28,13 +53,31 @@ jobs:
           fetch-depth: 0  # Fetch all history to allow for accurate branch creation
       - name: Update KAC and Sensor versions
         run: |
-          echo "Grabbing Falcon-KAC template..."
-          echo 'FALCON_KAC_TEMPLATE<<EOF' >> $GITHUB_ENV
-          cat .github/templates/falcon-kac.md >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+          kac_template='apiVersion: builtin
+                        kind: PatchTransformer
+                        metadata:
+                          name: falcon-kac-deploy
+                        target:
+                          group: kustomize.toolkit.fluxcd.io
+                        kind: Kustomization
+                        name: falcon-kac-deploy
+                        namespace: flux-system
+                        patch: |-
+                          - op: add
+                            path: \spec\patches\-\n
+                            value:\n
+                              target:\n
+                                group: helm.toolkit.fluxcd.io\n
+                                kind: HelmRelease\n
+                                name: falcon-kac\n
+                                namespace: falcon-kac-system\n
+                              patch: |-\n
+                                - op: replace\n
+                                  path: \spec\values\image\tag\n
+                                  value: "${{ inputs.kac-version }}"'
           echo "Updating KAC and Sensor versions..."
           sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/version.yaml
-          echo "$FALCON_KAC_TEMPLATE" > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
+          echo "$kac_template" > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
