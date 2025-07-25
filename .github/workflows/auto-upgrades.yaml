@@ -29,8 +29,10 @@ jobs:
         run: |
           ls
           echo "Updating download-any-image.yaml with new versions..."
+          cat "download-any-image.yaml"
           sed -i -z 's|imagename: falcon-kac\n    imagetag: .*"|imagename: falcon-kac\n    imagetag: "${{ inputs.kac-version }}"|gm' "download-any-image.yaml"
           sed -i -z 's|imagename: falcon-sensor\n    imagetag: .*"|imagename: falcon-sensor\n    imagetag: "${{ inputs.sensor-version }}"|gm' "download-any-image.yaml"
+          cat "download-any-image.yaml"
           echo "Updated download-any-image.yaml with new comments."
       - name: Update KAC and Sensor versions for dev
         run: |
@@ -62,14 +64,14 @@ jobs:
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          title: "Upgrade KAC and Sensor Dev"
-          body: |
-            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
-          branch: "upgrade-${{ github.run_id }}" # Unique branch name
-          commit-message: "Upgrade KAC and Sensor Dev"
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v7
+      #   with:
+      #     title: "Upgrade KAC and Sensor Dev"
+      #     body: |
+      #       Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
+      #     branch: "upgrade-${{ github.run_id }}" # Unique branch name
+      #     commit-message: "Upgrade KAC and Sensor Dev"
   # This job creates a pull request for nonprod upgrades
   # create-nonprod-pr:
   #   runs-on: ubuntu-latest
