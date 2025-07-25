@@ -18,7 +18,8 @@ on:
           - production
 
 jobs:
-  create-pr:
+  # This job creates a pull request for dev upgrades
+  create-dev-pr:
     runs-on: ubuntu-latest
     if: inputs.environment == 'dev & nonprod'
     steps:
@@ -28,11 +29,11 @@ jobs:
           fetch-depth: 0  # Fetch all history to allow for accurate branch creation
       - name: Update download-any-image.yaml
         run: |
-          ls -l download-any-image.yaml
-          sed -i -z 's|imagename: falcon-kac\n    imagetag: .*|imagename: falcon-kac\n    imagetag: "${{ inputs.kac-version }}"|' download-any-image.yaml
-          sed -i -z 's|imagename: falcon-sensor\n    imagetag: .*|imagename: falcon-sensor\n    imagetag: "${{ inputs.sensor-version }}"|' download-any-image.yaml
+          ls
+          sed -i -z 's|imagename: falcon-kac\n    imagetag: .*"|imagename: falcon-kac\n    imagetag: "${{ inputs.kac-version }}"|gm' download-any-image.yaml
+          sed -i -z 's|imagename: falcon-sensor\n    imagetag: .*"|imagename: falcon-sensor\n    imagetag: "${{ inputs.sensor-version }}"|gm' download-any-image.yaml
           echo "Updated download-any-image.yaml with new comments."
-      - name: Update KAC and Sensor versions for dev & nonprod
+      - name: Update KAC and Sensor versions for dev
         run: |
           kac_template='apiVersion: builtin
           kind: PatchTransformer
@@ -57,17 +58,63 @@ jobs:
                     path: /spec/values/image/tag
                     value: "${{ inputs.kac-version }}"'
           echo "Applying KAC template and Sensor version..."
-          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/falcon-sensor.yaml config/base/cluster/stable-nonprod/transformers/falcon-sensor.yaml
+          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/falcon-sensor.yaml
           echo "$kac_template" > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
-          echo "$kac_template" > config/base/cluster/stable-nonprod/transformers/kac-transformer.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          title: "Upgrade KAC and Sensor"
+          title: "Upgrade KAC and Sensor Dev"
           body: |
             Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
           branch: "upgrade-${{ github.run_id }}" # Unique branch name
-          commit-message: "Upgrade KAC and Sensor"
+          commit-message: "Upgrade KAC and Sensor Dev"
+  # This job creates a pull request for nonprod upgrades
+  # create-nonprod-pr:
+  #   runs-on: ubuntu-latest
+  #   if: inputs.environment == 'dev & nonprod'
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0  # Fetch all history to allow for accurate branch creation
+  #     - name: Update KAC and Sensor versions for nonprod
+  #       run: |
+  #         kac_template='apiVersion: builtin
+  #         kind: PatchTransformer
+  #         metadata:
+  #           name: falcon-kac-deploy
+  #         target:
+  #           group: kustomize.toolkit.fluxcd.io
+  #           kind: Kustomization
+  #           name: falcon-kac-deploy
+  #           namespace: flux-system
+  #         patch: |-
+  #           - op: add
+  #             path: /spec/patches/-
+  #             value:
+  #               target:
+  #                 group: helm.toolkit.fluxcd.io
+  #                 kind: HelmRelease
+  #                 name: falcon-kac
+  #                 namespace: falcon-kac-system
+  #               patch: |-
+  #                 - op: replace
+  #                   path: /spec/values/image/tag
+  #                   value: "${{ inputs.kac-version }}"'
+  #         echo "Applying KAC template and Sensor version..."
+  #         sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/stable-nonprod/transformers/falcon-sensor.yaml
+  #         echo "$kac_template" > config/base/cluster/stable-nonprod/transformers/kac-transformer.yaml
+  #         echo "KAC version: ${{ inputs.kac-version }}"
+  #         echo "Sensor version: ${{ inputs.sensor-version }}"
+
+  #     - name: Create Pull Request
+  #       uses: peter-evans/create-pull-request@v7
+  #       with:
+  #         title: "Upgrade KAC and Sensor Nonprod"
+  #         body: |
+  #           Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
+  #         branch: "upgrade-${{ github.run_id }}" # Unique branch name
+  #         commit-message: "Upgrade KAC and Sensor Nonprod"
