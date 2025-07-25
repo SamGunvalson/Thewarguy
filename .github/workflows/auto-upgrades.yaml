@@ -31,7 +31,6 @@ jobs:
           echo "Updating download-any-image.yaml with new versions..."
           cat "download-any-image.yaml"
           sed -i -z 's|imagename: falcon-kac\n    imagetag: .*"|imagename: falcon-kac\n    imagetag: "${{ inputs.kac-version }}"|gm' "download-any-image.yaml"
-          sed -i -z 's|imagename: falcon-sensor\n    imagetag: .*"|imagename: falcon-sensor\n    imagetag: "${{ inputs.sensor-version }}"|gm' "download-any-image.yaml"
           cat "download-any-image.yaml"
           echo "Updated download-any-image.yaml with new comments."
       - name: Update KAC and Sensor versions for dev
