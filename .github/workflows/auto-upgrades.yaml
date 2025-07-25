@@ -18,7 +18,7 @@ on:
           - 'dev & nonprod'
 
 env:
-  KAC-TRANSFORMER: 'apiVersion:builtin\nkind:PatchTransformer\nmetadata:\nname:falcon-kac-deploy\ntarget:\ngroup:kustomize.toolkit.fluxcd.io\nkind:Kustomization\nname:falcon-kac-deploy\nnamespace:flux-system\npatch:|-\n-op:add\npath:\spec\patches\-\nvalue:\ntarget:\ngroup:helm.toolkit.fluxcd.io\nkind:HelmRelease\nname:falcon-kac\nnamespace:falcon-kac-system\npatch:|-\n-op:replace\npath:\spec\values\image\tag\nvalue:"${{inputs.kac-version}}"'
+  KACTRANSFORMER: 'apiVersion:builtin\nkind:PatchTransformer\nmetadata:\nname:falcon-kac-deploy\ntarget:\ngroup:kustomize.toolkit.fluxcd.io\nkind:Kustomization\nname:falcon-kac-deploy\nnamespace:flux-system\npatch:|-\n-op:add\npath:\spec\patches\-\nvalue:\ntarget:\ngroup:helm.toolkit.fluxcd.io\nkind:HelmRelease\nname:falcon-kac\nnamespace:falcon-kac-system\npatch:|-\n-op:replace\npath:\spec\values\image\tag\nvalue:"${{inputs.kac-version}}"'
 
 jobs:
   create-prs:
@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "Updating KAC and Sensor versions..."
           sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/version.yaml
-          echo "$KAC-TRANSFORMER" > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
+          echo "$KACTRANSFORMER" > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
