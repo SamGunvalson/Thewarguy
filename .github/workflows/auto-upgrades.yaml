@@ -63,14 +63,14 @@ jobs:
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
-      # - name: Create Pull Request
-      #   uses: peter-evans/create-pull-request@v7
-      #   with:
-      #     title: "Upgrade KAC and Sensor Dev"
-      #     body: |
-      #       Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
-      #     branch: "upgrade-${{ github.run_id }}" # Unique branch name
-      #     commit-message: "Upgrade KAC and Sensor Dev"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "Upgrade KAC and Sensor Dev"
+          body: |
+            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
+          branch: "upgrade-${{ github.run_id }}" # Unique branch name
+          commit-message: "Upgrade KAC and Sensor Dev"
   # This job creates a pull request for nonprod upgrades
   create-nonprod-pr:
     runs-on: ubuntu-latest
