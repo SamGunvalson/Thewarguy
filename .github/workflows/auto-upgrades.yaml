@@ -57,8 +57,8 @@ jobs:
                     path: /spec/values/image/tag
                     value: "${{ inputs.kac-version }}"'
           echo "Applying KAC template and Sensor version..."
-          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/gke-pe-dev/transformers/falcon-sensor.yaml
-          echo "$kac_template" > config/base/cluster/gke-pe-dev/transformers/kac-transformer.yaml
+          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/global/gke-pe-dev/transformers/falcon-sensor.yaml
+          echo "$kac_template" > config/base/cluster/global/gke-pe-dev/transformers/kac-transformer.yaml
           sed -i -z 's|transformers:\n|transformers:\n- transformers/falcon-kac.yaml|' config/base/cluster/global/gke-pe-dev/kustomization.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
@@ -105,8 +105,8 @@ jobs:
                     path: /spec/values/image/tag
                     value: "${{ inputs.kac-version }}"'
           echo "Applying KAC template and Sensor version..."
-          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/stable-nonprod/transformers/falcon-sensor.yaml
-          echo "$kac_template" > config/base/cluster/stable-nonprod/transformers/kac-transformer.yaml
+          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/global/stable-nonprod/transformers/falcon-sensor.yaml
+          echo "$kac_template" > config/base/cluster/global/stable-nonprod/transformers/kac-transformer.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
           echo "Sensor version: ${{ inputs.sensor-version }}"
 
@@ -131,8 +131,8 @@ jobs:
       - name: Remove Dev and Nonprod Transformations
         run: |
           echo "Removing dev and nonprod transformations..."
-          rm -f config/base/cluster/gke-pe-dev/transformers/falcon-kac.yaml
-          rm -f config/base/cluster/stable-nonprod/transformers/falcon-kac.yaml
+          rm -f config/base/cluster/global/gke-pe-dev/transformers/falcon-kac.yaml
+          rm -f config/base/cluster/global/stable-nonprod/transformers/falcon-kac.yaml
           sed -i '/- transformers\/falcon-kac.yaml/d' config/base/cluster/global/gke-pe-dev/kustomization.yaml config/base/cluster/global/stable-nonprod/kustomization.yaml
           echo "Removing KAC template and Sensor version..."
           sed -i -z 's|        - op: replace\n          path: /spec/values/node/image/tag\n          value:.*|#version|' config/base/cluster/gke-pe-dev/transformers/falcon-sensor.yaml config/base/cluster/stable-nonprod/transformers/falcon-sensor.yaml
