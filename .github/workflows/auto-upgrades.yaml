@@ -133,7 +133,7 @@ jobs:
           echo "Removing dev and nonprod transformations..."
           rm -f config/base/cluster/gke-pe-dev/transformers/falcon-kac.yaml
           rm -f config/base/cluster/stable-nonprod/transformers/falcon-kac.yaml
-          sed -i '- transformers/falcon-kac.yaml\n' config/base/cluster/global/gke-pe-dev/kustomization.yaml config/base/cluster/global/stable-nonprod/kustomization.yaml
+          sed -i '|- transformers/falcon-kac.yaml|d' config/base/cluster/global/gke-pe-dev/kustomization.yaml config/base/cluster/global/stable-nonprod/kustomization.yaml
           echo "Removing KAC template and Sensor version..."
           sed -i -z 's|        - op: replace\n          path: /spec/values/node/image/tag\n          value:.*|#version|' config/base/cluster/gke-pe-dev/transformers/falcon-sensor.yaml config/base/cluster/stable-nonprod/transformers/falcon-sensor.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
