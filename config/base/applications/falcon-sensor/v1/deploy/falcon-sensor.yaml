@@ -100,7 +100,7 @@ spec:
         pullSecrets:
         # Overrides the image tag. In general, tags should not be used (including semver tags or `latest`). This variable is provided for those
         # who have yet to move off of using tags. The sha256 digest should be used in place of tags for increased security and image immutability.
-        tag: "7.26.0-17905-1.falcon-linux.Release.US-2"
+        tag: "321"
         # Setting a digest will override any tag and should be used instead of tags.
         #
         # Example digest variable configuration:
