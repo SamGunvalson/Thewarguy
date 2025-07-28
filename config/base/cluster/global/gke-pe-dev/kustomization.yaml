@@ -1,3 +1,2 @@
 transformers:
-- transformers/falcon-kac.yaml
 - transformers/falcon-sensor.yaml
