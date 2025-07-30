@@ -80,14 +80,14 @@ jobs:
           sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/global/gke-pe-dev/transformers/falcon-sensor.yaml
           echo "Sensor version updated to ${{ inputs.sensor-version }}."
 
-      # - name: Create Pull Request
-      #   uses: peter-evans/create-pull-request@v7
-      #   with:
-      #     title: "Upgrade KAC and/or Sensor Dev"
-      #     body: |
-      #       Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
-      #     branch: "upgrade-${{ github.run_id }}" # Unique branch name
-      #     commit-message: "Upgrade KAC and/or Sensor Dev"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "Upgrade KAC and/or Sensor Dev"
+          body: |
+            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
+          branch: "upgrade-${{ github.run_id }}" # Unique branch name
+          commit-message: "Upgrade KAC and/or Sensor Dev"
 
   # This job creates a pull request for nonprod upgrades
   create-nonprod-pr:
@@ -134,14 +134,14 @@ jobs:
           sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/global/stable-nonprod/transformers/falcon-sensor.yaml
           echo "Sensor version updated to ${{ inputs.sensor-version }}."
 
-  #     - name: Create Pull Request
-  #       uses: peter-evans/create-pull-request@v7
-  #       with:
-  #         title: "Upgrade KAC and/or Sensor Nonprod"
-  #         body: |
-  #           Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
-  #         branch: "upgrade-${{ github.run_id }}" # Unique branch name
-  #         commit-message: "Upgrade KAC and/or Sensor Nonprod"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "Upgrade KAC and/or Sensor Nonprod"
+          body: |
+            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
+          branch: "upgrade-${{ github.run_id }}" # Unique branch name
+          commit-message: "Upgrade KAC and/or Sensor Nonprod"
 
   # This job creates a pull request for prod upgrades
   create-prod-pr:
