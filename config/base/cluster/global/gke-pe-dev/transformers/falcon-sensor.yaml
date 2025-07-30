@@ -20,6 +20,4 @@ patch: |-
         - op: replace
           path: /spec/values/falcon/tags
           value: "k8s-dev"
-        - op: replace
-          path: /spec/values/node/image/tag
-          value: "643567"
+#version
