@@ -86,7 +86,7 @@ jobs:
           title: "Upgrade KAC and/or Sensor Dev"
           body: |
             Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
-          branch: "upgrade-${{ github.run_id }}" # Unique branch name
+          branch: "upgrade-${{ github.run_id }}-dev" # Unique branch name
           commit-message: "Upgrade KAC and/or Sensor Dev"
 
   # This job creates a pull request for nonprod upgrades
@@ -140,7 +140,7 @@ jobs:
           title: "Upgrade KAC and/or Sensor Nonprod"
           body: |
             Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
-          branch: "upgrade-${{ github.run_id }}" # Unique branch name
+          branch: "upgrade-${{ github.run_id }}-np" # Unique branch name
           commit-message: "Upgrade KAC and/or Sensor Nonprod"
 
   # This job creates a pull request for prod upgrades
@@ -181,5 +181,5 @@ jobs:
           title: "Upgrade KAC and/or Sensor prod"
           body: |
             Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
-          branch: "upgrade-${{ github.run_id }}" # Unique branch name
+          branch: "upgrade-${{ github.run_id }}-prod" # Unique branch name
           commit-message: "Upgrade KAC and/or Sensor prod"
