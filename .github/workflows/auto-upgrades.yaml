@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "Updating download-any-image.yaml with new KAC version..."
           cat "download-any-image.yaml"
-          sed -i -z 's|falcon-kac\n    imagetag: .*"|falcon-kac\n    imagetag: "${{ inputs.kac-version }}"|m' download-any-image.yaml
+          sed -i '/falcon-kac/{n;s|imagetag: .*|imagetag: "${{ inputs.kac-version }}"|;}' download-any-image.yaml
           cat "download-any-image.yaml"
           echo "Updated download-any-image.yaml with new KAC version."
 
