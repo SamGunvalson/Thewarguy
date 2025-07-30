@@ -9,10 +9,10 @@ include:
     imagetag: "2.8"
   - imagerepo: registry.crowdstrike.com/falcon-sensor/us-2/release
     imagename: falcon-sensor
-    imagetag: "7.26.0-17905-1.falcon-linux.Release.US-2"
+    imagetag: "643567"
   - imagerepo: registry.crowdstrike.com/falcon-kac/us-2/release
     imagename: falcon-kac
-    imagetag: "7.27.0-2502.Release.US-2"
+    imagetag: "rest"
   # - imagerepo: ghcr.io/headlamp-k8s
   #   imagename: headlamp
   #   imagetag: "v0.28.0"
