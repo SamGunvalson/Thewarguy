@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "Updating download-any-image.yaml with new KAC version..."
           cat "download-any-image.yaml"
-          sed -i '/falcon-kac/{n;s|imagetag: .*|imagetag: "${{ inputs.kac-version }}"|;}' download-any-image.yaml
+          sed -i '/imagename: falcon-kac/{n;s|imagetag: .*|imagetag: "${{ inputs.kac-version }}"|;}' download-any-image.yaml
           cat "download-any-image.yaml"
           echo "Updated download-any-image.yaml with new KAC version."
 
@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "Updating download-any-image.yaml with new Sensor version..."
           cat "download-any-image.yaml"
-          sed -i -z 's|falcon-sensor\n    imagetag: .*"|falcon-sensor\n    imagetag: "${{ inputs.sensor-version }}"|m' download-any-image.yaml
+          sed -i '/imagename: falcon-sensor/{n;s|imagetag: .*|imagetag: "${{ inputs.sensor-version }}"|;}' download-any-image.yaml
           cat "download-any-image.yaml"
           echo "Updated download-any-image.yaml with new Sensor version."
 
