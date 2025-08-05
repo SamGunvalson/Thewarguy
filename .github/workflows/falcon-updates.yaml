@@ -1,4 +1,4 @@
-name: Automated Falcon Upgrades
+name: Automated Falcon Upgrades TFE
 
 on:
   workflow_dispatch:
