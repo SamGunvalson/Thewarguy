@@ -1,0 +1,163 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: falcon-sensor
+  namespace: falcon-sensor-system
+spec:
+  interval: 5m0s
+  url: https://crowdstrike.github.io/falcon-helm
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: falcon-sensor
+  namespace: falcon-sensor-system
+spec:
+  timeout: 20m
+  releaseName: falcon-sensor
+  chart:
+    spec:
+      chart: falcon-sensor
+      sourceRef:
+        kind: HelmRepository
+        name: falcon-sensor
+        namespace: falcon-sensor-system
+      version: 1.29.1
+  interval: 5m0s
+  values:
+    # pulled from https://github.com/CrowdStrike/falcon-helm/blob/main/helm-charts/falcon-sensor/README.md
+    # Default values for falcon-sensor.
+    # This is a YAML-formatted file.
+    # Declare variables to be passed into your templates.
+
+    node:
+      # When enabled, Helm chart deploys the Falcon Sensors to Kubernetes nodes
+      enabled: true
+
+      # Overrides the backend leveraged by the Falcon Sensor (kernel, bpf)
+      backend: bpf
+
+      # Enable for use on Google's GKE Autopilot clusters
+      gke:
+        autopilot: false
+
+      daemonset:
+        # Annotations to apply to the daemonset
+        annotations: {}
+
+        # The key that is used to handle enabling/disabling sensor injection at the pod/node level
+        podAnnotationKey: sensor.falcon-system.crowdstrike.com/injection
+
+        # additionals labels
+        labels: {}
+
+        # Enable the priorityClass creation on chart installation
+        priorityClassCreate: false
+        # Assign a PriorityClassName to pods if set
+        priorityClassName: ""
+        priorityClassValue: 1000000000
+
+        tolerations:
+          # We want to schedule on control plane nodes where they are accessible
+          - key: "node-role.kubernetes.io/master"
+            operator: "Exists"
+            effect: "NoSchedule"
+          # Future taint for K8s >=1.24
+          - key: "node-role.kubernetes.io/control-plane"
+            operator: "Exists"
+            effect: "NoSchedule"
+          - key: "kubernetes.azure.com/scalesetpriority"
+            operator: "Equal"
+            value: "spot"
+            effect: "NoSchedule"
+          # Daemonsets automatically get additional tolerations: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+
+        # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+        # Allow setting additional node selections e.g. processor type
+        # nodeAffinity:
+        #   requiredDuringSchedulingIgnoredDuringExecution:
+        #     nodeSelectorTerms:
+        #     - matchExpressions:
+        #       - key: kubernetes.io/arch
+        #         operator: In
+        #         values:
+        #         - amd64
+        nodeAffinity: {}
+
+        # Resource settings that can be set with backend is set to bpf only. Cannot be used when backend is set to kernel.
+        # This will be ignored if backend is set to kernel. Purposefully. The defaults are set to the minimum requirements.
+        # Depending on the size of your cluster and the node types, you may need to increase these values.
+        # resources:
+        #   limits:
+        #     cpu: 250m
+        #     ephemeral-storage: 100Mi
+        #     memory: 500Mi
+        #   requests:
+        #     cpu: 250m
+        #     ephemeral-storage: 100Mi
+        #     memory: 500Mi
+
+        # Update strategy to role out new daemonset configuration to the nodes.
+        updateStrategy: RollingUpdate
+
+        # Sets the max unavailable nodes. Default is 1 when no value exists.
+        maxUnavailable: 5
+
+      image:
+        repository: docker.generalmills.com/falcon-sensor
+        pullPolicy: Always
+        pullSecrets:
+        # Overrides the image tag. In general, tags should not be used (including semver tags or `latest`). This variable is provided for those
+        # who have yet to move off of using tags. The sha256 digest should be used in place of tags for increased security and image immutability.
+        tag: "7.26.0-17905-1.falcon-linux.Release.US-2"
+        # Setting a digest will override any tag and should be used instead of tags.
+        #
+        # Example digest variable configuration:
+        # digest: sha256:ffdc91f66ef8570bd7612cf19145563a787f552656f5eec43cd80ef9caca0398
+        digest:
+
+        # Value must be base64. This setting conflicts with node.image.pullSecrets
+        # The base64 encoded string of the docker config json for the pull secret can be
+        # gotten through:
+        # $ cat ~/.docker/config.json | base64 -
+        registryConfigJSON:
+
+      podAnnotations: {}
+
+      # How long to wait for Falcon pods to stop gracefully
+      terminationGracePeriod: 30
+
+      hooks:
+        # Settings for the node post-delete helm hook
+        postDelete:
+          enabled: true
+
+    container:
+      # When enabled, Helm chart deploys the Falcon Container Sensor to Pods through Webhooks
+      enabled: false
+
+    serviceAccount:
+      name: crowdstrike-falcon-sa
+      annotations: {}
+
+    # Deploys the test suite during install for testing purposes.
+    testing:
+      enabled: false
+
+    falcon:
+      cid: "E87E64B892B6412FA60CC7B28BCF23CC-52"
+      apd:
+      aph:
+      app:
+      trace: none
+      feature:
+      message_log:
+      billing:
+      tags:
+      provisioning_token:
+
+    # Override various naming aspects of this chart
+    # Only edit these if you know what you're doing
+    nameOverride: ""
+    fullnameOverride: ""

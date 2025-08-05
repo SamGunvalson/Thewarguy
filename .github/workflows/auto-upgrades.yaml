@@ -20,7 +20,7 @@ on:
 jobs:
   # This job creates a pull request for dev upgrades
   create-dev-pr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     if: inputs.environment == 'dev & nonprod' && (inputs.kac-version || inputs.sensor-version)
     steps:
       - name: Checkout repository
@@ -70,7 +70,7 @@ jobs:
                     value: "${{ inputs.kac-version }}"'
           echo "Applying KAC template"
           echo "$kac_template" > config/base/cluster/global/gke-pe-dev/transformers/kac-transformer.yaml
-          sed -i -z 's|transformers:\n|transformers:\n- transformers/falcon-kac.yaml|' config/base/cluster/global/gke-pe-dev/kustomization.yaml
+          sed -i '/^transformers:/a - transformers/falcon-kac.yaml' config/base/cluster/global/gke-pe-dev/kustomization.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
 
       - name: Update Sensor Deployment
@@ -91,7 +91,7 @@ jobs:
 
   # This job creates a pull request for nonprod upgrades
   create-nonprod-pr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     if: inputs.environment == 'dev & nonprod' && (inputs.kac-version || inputs.sensor-version)
     steps:
       - name: Checkout repository
@@ -131,7 +131,9 @@ jobs:
         if: inputs.sensor-version
         run: |
           echo "Updating Sensor deployment with new version..."
-          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' config/base/cluster/global/stable-nonprod/transformers/falcon-sensor.yaml
+          sed -i 's|#version.*|        - op: replace\
+                    path: /spec/values/node/image/tag\
+                    value: "${{ inputs.sensor-version }}"|' config/base/cluster/global/stable-nonprod/transformers/falcon-sensor.yaml
           echo "Sensor version updated to ${{ inputs.sensor-version }}."
 
       - name: Create Pull Request
@@ -145,7 +147,7 @@ jobs:
 
   # This job creates a pull request for prod upgrades
   create-prod-pr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     if: inputs.environment == 'production' && (inputs.kac-version || inputs.sensor-version)
     steps:
       - name: Checkout repository
@@ -169,11 +171,11 @@ jobs:
       - name: Update KAC version for prod
         if: inputs.kac-version
         run: |
-          sed -i 's|tag: .*"|tag: "${{ inputs.kac-version }}"|gm' config/base/applications/falcon-kac/v1/deploy/falcon-kac.yaml
+          sed -i 's|tag: .*"|tag: "${{ inputs.kac-version }}"|' config/base/applications/falcon-kac/v1/deploy/falcon-kac.yaml
       - name: Update Sensor version for prod
         if: inputs.sensor-version
         run: |
-          sed -i 's|tag: .*"|tag: "${{ inputs.sensor-version }}"|gm' config/base/applications/falcon-sensor/v1/deploy/falcon-sensor.yaml
+          sed -i 's|tag: .*"|tag: "${{ inputs.sensor-version }}"|' config/base/applications/falcon-sensor/v1/deploy/falcon-sensor.yaml
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

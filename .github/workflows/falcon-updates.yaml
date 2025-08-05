@@ -1,0 +1,85 @@
+name: Automated Falcon Upgrades
+
+on:
+  workflow_dispatch:
+    inputs:
+      kac-version:
+        description: 'KAC version'
+        required: false
+      sensor-version:
+        description: 'Sensor version'
+        required: false
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - production
+
+jobs:
+  # This job creates a pull request for dev upgrades
+  create-dev-pr:
+    runs-on: ubuntu
+    if: inputs.environment == 'dev' && (inputs.kac-version || inputs.sensor-version)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update KAC Deployment
+        if: inputs.kac-version
+        run: |
+          echo "Updating KAC deployment with new version..."
+          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/image/tag\n          value: "${{ inputs.kac-version }}"|' k8s/apps/tst-uc1/falcon-kac.yaml k8s/apps/tst-ue4/falcon-kac.yaml
+          echo "KAC version: ${{ inputs.kac-version }}"
+
+      - name: Update Sensor Deployment
+        if: inputs.sensor-version
+        run: |
+          echo "Updating Sensor deployment with new version..."
+          sed -i -z 's|#version.*|        - op: replace\n          path: /spec/values/node/image/tag\n          value: "${{ inputs.sensor-version }}"|' k8s/apps/tst-uc1/falcon-sensor.yaml k8s/apps/tst-ue4/falcon-sensor.yaml
+          echo "Sensor version updated to ${{ inputs.sensor-version }}."
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "Upgrade KAC and/or Sensor Dev"
+          body: |
+            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
+          branch: "upgrade-${{ github.run_id }}-dev" # Unique branch name
+          commit-message: "Upgrade KAC and/or Sensor Dev"
+
+  # This job creates a pull request for prod upgrades
+  create-prod-pr:
+    runs-on: ubuntu
+    if: inputs.environment == 'production' && (inputs.kac-version || inputs.sensor-version)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history to allow for accurate branch creation
+
+
+      - name: Remove Dev Sensor Transformation
+        if: inputs.sensor-version
+        run: |
+          echo "Removing Sensor version..."
+          sed -i -z 's|        - op: replace\n          path: /spec/values/node/image/tag\n          value:.*|#version|' k8s/apps/tst-uc1/falcon-sensor.yaml k8s/apps/tst-ue4/falcon-sensor.yaml
+
+      - name: Update KAC version for prod
+        if: inputs.kac-version
+        run: |
+          sed -i 's|tag: .*"|tag: "${{ inputs.kac-version }}"|' k8s/apps/base/falcon-kac/v1/deploy/falcon-kac.yaml
+      - name: Update Sensor version for prod
+        if: inputs.sensor-version
+        run: |
+          sed -i 's|tag: .*"|tag: "${{ inputs.sensor-version }}"|' k8s/apps/base/falcon-sensor/v1/deploy/falcon-sensor.yaml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "Upgrade KAC and/or Sensor prod"
+          body: |
+            Upgrade KAC to ${{ inputs.kac-version }} and Sensor to ${{ inputs.sensor-version }}.
+          branch: "upgrade-${{ github.run_id }}-prod" # Unique branch name
+          commit-message: "Upgrade KAC and/or Sensor prod"
