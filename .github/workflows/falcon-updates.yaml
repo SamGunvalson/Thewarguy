@@ -20,7 +20,7 @@ on:
 jobs:
   # This job creates a pull request for dev upgrades
   create-dev-pr:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     if: inputs.environment == 'dev' && (inputs.kac-version || inputs.sensor-version)
     steps:
       - name: Checkout repository
@@ -51,7 +51,7 @@ jobs:
 
   # This job creates a pull request for prod upgrades
   create-prod-pr:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     if: inputs.environment == 'production' && (inputs.kac-version || inputs.sensor-version)
     steps:
       - name: Checkout repository
