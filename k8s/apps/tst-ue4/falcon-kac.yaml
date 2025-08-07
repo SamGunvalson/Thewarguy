@@ -16,4 +16,6 @@ patch: |-
         kind: HelmRelease
         name: falcon-kac
         namespace: falcon-kac-system
-#version
+        - op: replace
+          path: /spec/values/image/tag
+          value: "123"
