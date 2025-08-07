@@ -63,13 +63,13 @@ jobs:
         if: inputs.kac-version
         run: |
           echo "Removing KAC version..."
-          sed -i -z 's|      patch: \|-\n        - op: replace\n          path: /spec/values/node/image/tag\n          value:.*|#version|' k8s/apps/tst-ue4/falcon-sensor.yaml
+          sed -i -z 's|      patch: \|-\n        - op: replace\n          path: /spec/values/node/image/tag\n          value:.*|#version|' k8s/apps/tst-uc1/falcon-kac.yaml k8s/apps/tst-ue4/falcon-kac.yaml
 
       - name: Remove Dev Sensor Transformation
         if: inputs.sensor-version
         run: |
           echo "Removing Sensor version..."
-          sed -i -z 's|        - op: replace\n          path: /spec/values/node/image/tag\n          value:.*|#version|' k8s/apps/tst-uc1/falcon-sensor.yaml
+          sed -i -z 's|        - op: replace\n          path: /spec/values/node/image/tag\n          value:.*|#version|' k8s/apps/tst-uc1/falcon-sensor.yaml k8s/apps/tst-ue4/falcon-sensor.yaml
 
       - name: Update KAC version for prod
         if: inputs.kac-version
