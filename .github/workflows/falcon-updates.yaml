@@ -30,7 +30,7 @@ jobs:
         if: inputs.kac-version
         run: |
           echo "Updating KAC deployment with new version..."
-          sed -i -z 's|#version.*|      patch: |-\n        - op: replace\n          path: /spec/values/image/tag\n          value: "${{ inputs.kac-version }}"|' k8s/apps/tst-uc1/falcon-kac.yaml k8s/apps/tst-ue4/falcon-kac.yaml
+          sed -i "s|#version.*|      patch: |-\n        - op: replace\n          path: /spec/values/image/tag\n          value: \"\${{ inputs.kac-version }}\"|" k8s/apps/tst-uc1/falcon-kac.yaml k8s/apps/tst-ue4/falcon-kac.yaml
           echo "KAC version: ${{ inputs.kac-version }}"
 
       - name: Update Sensor Deployment
